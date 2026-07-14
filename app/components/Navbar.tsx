@@ -1,8 +1,47 @@
-import { Link } from "react-router";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router";
 import { Search, Trash2, User } from "lucide-react";
 import ThemeToggle from "~/components/ThemeToggle";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
+  const [search, setSearch] = useState("");
+
+  const pages = [
+    {
+      keywords: ["home", "landing", "main"],
+      path: "/",
+    },
+    {
+      keywords: ["upload", "resume", "analyze", "analysis"],
+      path: "/upload",
+    },
+    {
+      keywords: ["clear", "wipe", "delete", "remove"],
+      path: "/wipe",
+    },
+  ];
+
+  const handleSearch = () => {
+    const query = search.toLowerCase().trim();
+
+    if (!query) return;
+
+    const page = pages.find((page) =>
+      page.keywords.some((keyword) =>
+        keyword.includes(query)
+      )
+    );
+
+    if (page) {
+      navigate(page.path);
+      setSearch("");
+    } else {
+      alert(`No page found for "${query}"`);
+    }
+  };
+
   return (
     <header className="flex justify-center pt-5">
       <nav
@@ -48,17 +87,30 @@ const Navbar = () => {
 
           {/* Right */}
           <div className="flex items-center gap-4">
-
             {/* Search */}
             <div className="flex h-10 w-64 items-center rounded-full bg-[#3B3B3F] px-4 transition-all duration-200 hover:bg-[#444448]">
               <Search
                 size={20}
-                className="text-gray-400 flex-shrink-0"
+                onClick={handleSearch}
+                className="
+                  flex-shrink-0
+                  cursor-pointer
+                  text-gray-400
+                  transition
+                  hover:text-white
+                "
               />
 
               <input
                 type="text"
-                placeholder="Search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
+                placeholder="Search pages..."
                 className="
                   !w-full
                   !bg-transparent
